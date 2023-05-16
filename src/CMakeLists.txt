@@ -1,3 +1,5 @@
+find_package(SFML 2.5 COMPONENTS graphics audio REQUIRED)
+
 add_library(chip8-lib
         chip8.cpp
 )
@@ -11,5 +13,7 @@ add_executable(chip8-emulator
 )
 
 target_link_libraries(chip8-emulator
+sfml-graphics
+    sfml-audio
         chip8-lib
 )

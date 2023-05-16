@@ -1,5 +1,6 @@
 #include "chip8.h"
 #include "gtest/gtest.h"
+
 TEST(Chip8Test, Constructor) {
   Chip8 chip8{};
   // Test that the font is loaded correctly
@@ -43,8 +44,13 @@ TEST(Chip8Test, Fetch) {
 TEST(Chip8Test, ClearScreen) {
     Chip8 chip8;
     chip8.execute(0x00E0);
-    std::array<bool, 64 * 32>zeros = {0};
-    ASSERT_EQ(chip8.display.values, zeros);
+    bool zeros[64][32] = {0};
+    for(int x=0; x<64; x++){
+        for(int y=0; y<32; y++){
+            ASSERT_EQ(chip8.display.values[x][y],0);
+        }
+    }
+
 }
 
 TEST(Chip8Test, ReturnFromSubroutine) {

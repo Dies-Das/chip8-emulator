@@ -6,7 +6,7 @@
 class Display
 {
 public:
-    std::array<bool, 64 * 32> values = {};
+    bool values[64][32] = {0};
 };
 class Chip8
 {
@@ -17,7 +17,7 @@ public:
     uint8_t delaytimer = 0;
     uint16_t I = 0;
     uint16_t PC = 0;
-
+    bool block = 0;
 
     Display display;
     std::array<uint8_t, 4096> ram = {};
