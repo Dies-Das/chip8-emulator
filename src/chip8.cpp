@@ -4,6 +4,7 @@
 #include <string.h>
 #include <time.h>
 #include <fstream>
+#include <iostream>
 #ifdef _WIN32
 #include <Windows.h>
 #else
@@ -31,10 +32,22 @@ Chip8::Chip8(std::string path)
         0xF0, 0x80, 0xF0, 0x80, 0x80  // F}
     };
     std::copy(font.begin(), font.end(), &ram.at(0x50));
-    std::ifstream ifs(path, std::ios::binary);
-    std::ifstream::pos_type pos = ifs.tellg();
-    ifs.seekg(0, std::ios::beg);
-    ifs.read(&ram[512], pos);
+    std::ifstream inputFile(path, std::ifstream::binary);
+    // get length of file
+    inputFile.seekg(0, inputFile.end);
+    int fileSize = inputFile.tellg();
+    inputFile.seekg(0, inputFile.beg);
+
+    // allocate memory for file content
+    char* buffer = new char[fileSize];
+
+    // read content of binary file
+    inputFile.read(buffer, fileSize);
+
+    // close input file
+    inputFile.close();
+    std::copy(buffer,buffer+fileSize,&ram.at(512));
+    delete[] buffer;
 };
 
 void Chip8::loop()
@@ -53,23 +66,30 @@ void Chip8::loop()
             redraw = this->execute(instr, window);
             if (redraw)
             {
-                for (int x = 0; x < 64; x++)
+                for (int x = 0; x < 32; x++)
+                
                 {
-                    for (int y = 0; y < 32; y++)
+                    for (int y = 0; y < 64; y++)
                     {
                         sf::RectangleShape rect(sf::Vector2f(4, 4));
-                        rect.setPosition(sf::Vector2f(x * 4, y * 4));
+                        rect.setPosition(sf::Vector2f(y * 4, x * 4));
                         if (this->display.values[x][y])
                         {
+                            // std::cout << "1 ";
                             rect.setFillColor(sf::Color(255, 255, 255, 255));
                         }
                         else
                         {
+                            // std::cout << "0 ";
                             rect.setFillColor(sf::Color(0, 0, 0, 255));
                         }
+                        
                         window.draw(rect);
+                        
                     }
+                    // std::cout << std::endl;
                 }
+                window.display();
             }
             usleep(sleeptime);
     }
@@ -220,8 +240,8 @@ int Chip8::execute(uint16_t instr, sf::Window &window)
     case 0xD:
         reg1 = (instr & 0x0F00) >> 8;
         reg2 = (instr & 0x00F0) >> 4;
-        x = this->regvar[reg1] & 63;
-        y = this->regvar[reg2] & 31;
+        
+        x = this->regvar[reg2] & 31;
         this->regvar[0xF] = 0;
         n = instr & 0xF;
 
@@ -229,6 +249,7 @@ int Chip8::execute(uint16_t instr, sf::Window &window)
         {
             const auto sdata = this->ram[this->I + k];
             uint8_t whichbit = 128;
+            y = this->regvar[reg1] & 63;
             for (int j = 0; j < 8; j++)
             {
                 auto sbit = whichbit & sdata;
@@ -242,17 +263,18 @@ int Chip8::execute(uint16_t instr, sf::Window &window)
                 {
                     this->display.values[x][y] = 1;
                 }
-                if (x == 63)
+                if (y == 63)
                 {
                     break;
                 }
-                x++;
+                y++;
+                whichbit>>=1;
             }
-            if (y == 31)
+            if (x == 31)
             {
                 break;
             }
-            y++;
+            x++;
         }
         redraw = 1;
         break;
@@ -321,8 +343,10 @@ int Chip8::execute(uint16_t instr, sf::Window &window)
     return redraw;
 };
 uint16_t Chip8::fetch()
-{
-    auto instr = 256 * ((uint16_t)this->ram[this->PC]) + (uint16_t)this->ram[this->PC];
+{   
+    auto val1 = (uint16_t)this->ram[this->PC];
+    auto val2 = (uint16_t)this->ram[this->PC+1];
+    auto instr = 256 * (val1) +val2 ;
     this->PC += 2;
     return instr;
 };

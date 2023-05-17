@@ -8,7 +8,7 @@
 class Display
 {
 public:
-    bool values[64][32] = {0};
+    bool values[32][64] = {0};
 };
 class Chip8
 {
@@ -22,7 +22,7 @@ public:
     bool block = 0;
 
     Display display;
-    std::array<char, 4096> ram = {};
+    std::array<unsigned char, 4096> ram = {};
     Chip8(std::string path);
     void loop();
     uint16_t fetch();

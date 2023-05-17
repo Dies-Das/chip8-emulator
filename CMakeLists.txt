@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 find_package(SFML 2.5 COMPONENTS graphics audio REQUIRED)
 
 #add_subdirectory(src)
-#add_subdirectory(test)
+add_subdirectory(test)
 add_library(chip8-lib
         src/chip8.cpp
 )
