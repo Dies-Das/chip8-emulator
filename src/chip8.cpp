@@ -3,15 +3,13 @@
 #include <cstdlib>
 #include <string.h>
 #include <time.h>
-#include <SFML/Window/Keyboard.hpp>
-#include <SFML/Window.hpp>
-#include <SFML/Graphics.hpp>
+#include <fstream>
 #ifdef _WIN32
 #include <Windows.h>
 #else
 #include <unistd.h>
 #endif
-Chip8::Chip8()
+Chip8::Chip8(std::string path)
 {
     std::srand(time(0));
     const std::array<uint8_t, 80> font = {
@@ -33,22 +31,26 @@ Chip8::Chip8()
         0xF0, 0x80, 0xF0, 0x80, 0x80  // F}
     };
     std::copy(font.begin(), font.end(), &ram.at(0x50));
+    std::ifstream ifs(path, std::ios::binary);
+    std::ifstream::pos_type pos = ifs.tellg();
+    ifs.seekg(0, std::ios::beg);
+    ifs.read(&ram[512], pos);
 };
 
 void Chip8::loop()
 {
+
     int sleeptime = (int)(1000.0 / 60);
+
     sf::RenderWindow window(sf::VideoMode(256, 128), "Chip8");
     while (window.isOpen())
     {
         sf::Event event;
-        while (window.pollEvent(event))
-        {
+
             bool redraw = 0;
-            if (event.type == sf::Event::Closed)
-                window.close();
+
             auto instr = this->fetch();
-            redraw = this->execute(instr);
+            redraw = this->execute(instr, window);
             if (redraw)
             {
                 for (int x = 0; x < 64; x++)
@@ -70,11 +72,10 @@ void Chip8::loop()
                 }
             }
             usleep(sleeptime);
-        }
     }
 };
 
-int Chip8::execute(uint16_t instr)
+int Chip8::execute(uint16_t instr, sf::Window &window)
 {
 
     const uint16_t mask = 0xF000;
@@ -295,7 +296,14 @@ int Chip8::execute(uint16_t instr)
             break;
         case 0x0A:
             if(this->block){
-                
+                sf::Event event;
+                window.pollEvent(event);
+                if(event.type ==sf::Event::KeyPressed){
+                    reg = (instr&0x0F00)>>8;
+                    this->regvar[reg] = event.key.code;
+                    this->block=false;
+                    this->PC += 2;
+                }
             }
             else{
                 this->PC -= 2;
