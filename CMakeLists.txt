@@ -20,8 +20,7 @@ add_executable(chip8-emulator
 
 target_link_libraries(chip8-emulator
         PRIVATE
-        sfml-graphics
-        sfml-audio
+
         chip8-lib
         ncurses
 )
