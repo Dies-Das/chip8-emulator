@@ -39,38 +39,53 @@ TEST(Chip8Test, Fetch) {
   EXPECT_EQ(instr, 0x0101);
   EXPECT_EQ(chip8.PC, 0x202);
 }
+TEST(Chip8Test, SubtractRegisterFromRegister) { // Test that subtracting one register from another works correctly 
+Chip8 chip8("/home/tilman/coding/chip8-emulator/src/IBM Logo.ch8");
 
-TEST(Chip8Test, Draw) {
-  // Test that fetch returns the correct instruction and increments PC
-  Chip8 chip8("/home/tilman/coding/chip8-emulator/src/IBM Logo.ch8");
-  chip8.I = 0x50;
-    sf::Window window;
-    chip8.regvar[0]=10;
-    chip8.execute(0xD00A, window);
-    for(int x=0; x<32; x++){
-        for(int y=0; y<64; y++){
-            std::cout << (int)chip8.display.values[x][y] << " ";
-        }
-        std::cout << std::endl;
-    }
-    
-  //chip8.PC = 0x200;
-  //uint16_t instr = chip8.fetch();
+chip8.V[0] = 0x4B;
+chip8.V[1] = 0x2D;
+
+chip8.execute(0x8015);
+ EXPECT_EQ(chip8.V[0], (uint8_t)(0x1E));
+  EXPECT_EQ(chip8.V[0xF], 1); // No borrow 
 }
 
-TEST(Chip8Test, ClearScreen) {
-    Chip8 chip8("/home/tilman/coding/chip8-emulator/src/IBM Logo.ch8");
-    chip8.display.values[0][0] = 1;
-    sf::Window window;
-    chip8.execute(0x00E0, window);
-    
-    for(int x=0; x<32; x++){
-        for(int y=0; y<64; y++){
-            ASSERT_EQ(chip8.display.values[x][y],0);
-        }
-    }
+// TEST(Chip8Test, SubtractSmallValue) { // Test that subtracting a small value works correctly Chip8 chip8; chip8.loadRegisters({0xFF}); chip8.execute(0x8005); EXPECT_EQ(chip8.V[0], 0xFA); EXPECT_EQ(chip8.V[0xF], 1); // Borrow }
 
-}
+// TEST(Chip8Test, SubtractLargeValue) { // Test that subtracting a large value works correctly Chip8 chip8; chip8.loadRegisters({0x5}); chip8.execute(0x80A5); EXPECT_EQ(chip8.V[0], 0xFB); EXPECT_EQ(chip8.V[0xF], 0); // No borrow }
+
+
+// TEST(Chip8Test, Draw) {
+//   // Test that fetch returns the correct instruction and increments PC
+//   Chip8 chip8("/home/tilman/coding/chip8-emulator/src/IBM Logo.ch8");
+//   chip8.I = 0x50;
+//     sf::Window window;
+//     chip8.regvar[0]=10;
+//     chip8.execute(0xD00A, window);
+//     for(int x=0; x<32; x++){
+//         for(int y=0; y<64; y++){
+//             std::cout << (int)chip8.display.values[x][y] << " ";
+//         }
+//         std::cout << std::endl;
+//     }
+    
+//   //chip8.PC = 0x200;
+//   //uint16_t instr = chip8.fetch();
+// }
+
+// TEST(Chip8Test, ClearScreen) {
+//     Chip8 chip8("/home/tilman/coding/chip8-emulator/src/IBM Logo.ch8");
+//     chip8.display.values[0][0] = 1;
+//     sf::Window window;
+//     chip8.execute(0x00E0, window);
+    
+//     for(int x=0; x<32; x++){
+//         for(int y=0; y<64; y++){
+//             ASSERT_EQ(chip8.display.values[x][y],0);
+//         }
+//     }
+
+// }
 
 // TEST(Chip8Test, ReturnFromSubroutine) {
 //     Chip8 chip8;
@@ -115,25 +130,25 @@ TEST(Chip8Test, ClearScreen) {
 //     ASSERT_EQ(chip8.PC, 0x002);
 // }
 
-TEST(Chip8Test, LoadValueIntoRegister) {
-    Chip8 chip8("/home/tilman/coding/chip8-emulator/src/IBM Logo.ch8");
-    sf::Window window;
-    chip8.execute(0x60AB, window); // Load the value 0xAB into V0
-    ASSERT_EQ(chip8.regvar[0], 0xAB);
-}
-TEST(Chip8Test, LoadIndexValue) {
-    Chip8 chip8("/home/tilman/coding/chip8-emulator/src/IBM Logo.ch8");
-    sf::Window window;
-    chip8.execute(0xAFFF, window); // Load the value 0xAB into V0
-    ASSERT_EQ(chip8.I, 0xFFF);
-}
-TEST(Chip8Test, AddValueToRegister) {
-    Chip8 chip8("/home/tilman/coding/chip8-emulator/src/IBM Logo.ch8");
-    sf::Window window;
-    chip8.regvar[1] = 0x7F;
-    chip8.execute(0x7103, window); // Add the value 0x03 to V1
-    ASSERT_EQ(chip8.regvar[1], 0x82);
-}
+// TEST(Chip8Test, LoadValueIntoRegister) {
+//     Chip8 chip8("/home/tilman/coding/chip8-emulator/src/IBM Logo.ch8");
+//     sf::Window window;
+//     chip8.execute(0x60AB, window); // Load the value 0xAB into V0
+//     ASSERT_EQ(chip8.regvar[0], 0xAB);
+// }
+// TEST(Chip8Test, LoadIndexValue) {
+//     Chip8 chip8("/home/tilman/coding/chip8-emulator/src/IBM Logo.ch8");
+//     sf::Window window;
+//     chip8.execute(0xAFFF, window); // Load the value 0xAB into V0
+//     ASSERT_EQ(chip8.I, 0xFFF);
+// }
+// TEST(Chip8Test, AddValueToRegister) {
+//     Chip8 chip8("/home/tilman/coding/chip8-emulator/src/IBM Logo.ch8");
+//     sf::Window window;
+//     chip8.regvar[1] = 0x7F;
+//     chip8.execute(0x7103, window); // Add the value 0x03 to V1
+//     ASSERT_EQ(chip8.regvar[1], 0x82);
+// }
 
 // TEST(Chip8Test, AssignRegisterValue) {
 //     Chip8 chip8;

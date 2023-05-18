@@ -10,7 +10,7 @@ target_include_directories(chip8-tests PUBLIC
 
 # Include and link Google Test
 find_package(SFML 2.5 COMPONENTS graphics audio REQUIRED)
-
+find_package(Curses REQUIRED)
 include(FetchContent)
 FetchContent_Declare(
         googletest
@@ -20,4 +20,4 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(googletest)
 
 target_link_libraries(chip8-tests gtest_main chip8-lib sfml-graphics
-sfml-audio)
+sfml-audio ncurses)

@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.15)
 project(chip8-emulator)
 
 set(CMAKE_CXX_STANDARD 17)
-find_package(SFML 2.5 COMPONENTS graphics audio REQUIRED)
 
+find_package(Curses REQUIRED)
 #add_subdirectory(src)
 add_subdirectory(test)
 add_library(chip8-lib
@@ -23,4 +23,5 @@ target_link_libraries(chip8-emulator
         sfml-graphics
         sfml-audio
         chip8-lib
+        ncurses
 )
